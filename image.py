@@ -86,50 +86,6 @@ class ImageGenerator:
                     if ViewEdges.VIEW_GROUPES in view_edges:
                         self.add_linked_nodes_by_edges(first_node, second_node, nodes, groupe_nodes, temp)
 
-    def build_list_options_persos(self, node_selected, lignes):
-        """
-        Récupère la map des nodes de persos et leur label dans le graphe complet
-        :param node_selected: noeud selectionné
-        :param lignes: les lignes du fichier dot
-        :return:  la map des nodes de persos
-        """
-        option_persos = []
-        label = ''
-        for l in lignes:
-            selected = ''
-            if 'peripheries=' + NodeType.node_peripheries.get(Personnage) + \
-                    ' shape=' + NodeType.node_shapes.get(Personnage) in l:
-                n = re.findall(r'([a-zA-Z]+) \[label=("([^\"]*)"|([^ ]*))', l)
-                nom_graph = n[0][0]
-                if n[0][2]:
-                    label = n[0][2]
-                elif n[0][3]:
-                    label = n[0][3]
-                if node_selected == nom_graph:
-                    selected = ' selected'
-                option_persos.append(f"""<option value="{nom_graph}"{selected}>{label}</option>""")
-        return option_persos
-
-    def build_list_options_persos2(self, lignes):
-        """
-        Récupère la map des nodes de persos et leur label dans le graphe complet
-        :param lignes: les lignes du fichier dot
-        :return:  la map des nodes de persos
-        """
-        option_persos = []
-        label = ''
-        for l in lignes:
-            if 'peripheries=' + NodeType.node_peripheries.get(Personnage) + \
-                    ' shape=' + NodeType.node_shapes.get(Personnage) in l:
-                n = re.findall(r'([a-zA-Z]+) \[label=("([^\"]*)"|([^ ]*))', l)
-                nom_graph = n[0][0]
-                if n[0][2]:
-                    label = n[0][2]
-                elif n[0][3]:
-                    label = n[0][3]
-                option_persos.append(f"""<option value="{nom_graph}">{label}</option>""")
-        return option_persos
-
     def get_perso_nodes(self, lignes):
         """
         Récupère la liste des nodes de perso dans le fichier graphe complet
@@ -235,21 +191,22 @@ class ImageGenerator:
                         if ViewEdges.VIEW_GROUPES in view_edges:
                             dot.edge(edge.first_node, edge.second_node, color=edge.fillcolor, dir=edge.dir)
 
-    def build_svg(self, node_selected, view_edges=[ViewEdges.VIEW_ALL]):
+    def build_svg(self, node_selected, view_edges, distance):
         lignes = self.get_lignes_graphe_complet()
         groupe_nodes = self.get_groupe_nodes(lignes)
 
         nodes = []
         if node_selected == 'All':
             nodes = self.get_perso_nodes(lignes)
-            if ViewEdges.VIEW_ALL in view_edges:
+            if ViewEdges.VIEW_GROUPES in view_edges:
                 nodes += groupe_nodes
         else:
             nodes.append(node_selected)
             # noeuds à degré 1
             self.add_linked_nodes(nodes, lignes, view_edges)
-            # noeuds à degré 2
-            self.add_linked_nodes(nodes, lignes, view_edges, groupe_nodes)
+            if distance != DistNode.DIST_ONE:
+                # noeuds à degré 2
+                self.add_linked_nodes(nodes, lignes, view_edges, groupe_nodes)
 
         dot = Digraph(name='GrapheTdC', filename='./tmp/gnTdcMini',
                       comment='La fleur au Fusil Mini', engine=ENGINE)

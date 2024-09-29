@@ -44,12 +44,16 @@ class Personnage(Groupe):
 
 
 class ViewEdges:
-    VIEW_ALL = 'A'
     VIEW_FAMILLE = 'F'
     VIEW_ENTENTE = 'E'
     VIEW_NEUTRAL = 'N'
     VIEW_OPPOSITION = 'O'
     VIEW_GROUPES = 'G'
+
+
+class DistNode:
+    DIST_ONE = '1'
+    DIST_TWO = '2'
 
 
 class NodeType:
