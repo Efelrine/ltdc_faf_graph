@@ -180,28 +180,30 @@ class GraphDataBuilder:
                     elif e[0][4]:
                         edge.color = e[0][4]
                     edge.direction = e[0][5]
-                    print(f"source {edge.source}, target {edge.target} : match {edge.color == Color.ENTENTE_COLOR} and {ViewEdges.VIEW_ENTENTE in view_edges}  ")
                     if (edge.color == Color.ENTENTE_COLOR and ViewEdges.VIEW_ENTENTE in view_edges
                             or edge.color == Color.FAMILLE_COLOR and ViewEdges.VIEW_FAMILLE in view_edges
                             or edge.color == Color.NEUTRAL_COLOR and ViewEdges.VIEW_NEUTRAL in view_edges
                             or edge.color == Color.OPPOSITION_COLOR and ViewEdges.VIEW_OPPOSITION in view_edges
                             or edge.color == Color.BLACK and ViewEdges.VIEW_GROUPES in view_edges):
-                        print("coucou")
                         edges_data.append(edge)
         return edges_data
 
     def build_graph_data(self, graph_parameters: GraphParameters) -> str:
         return self._build_graph_data(graph_parameters.node, graph_parameters.edges)
 
-    def _build_graph_data(self, node_selected, view_edges=[ViewEdges.VIEW_ALL]) -> str:
+    def _build_graph_data(self, node_selected, view_edges=[]) -> str:
         full_graph = self.get_full_graph()
         groups = self.get_group_ids(full_graph)
 
+        all_edges = [ViewEdges.VIEW_FAMILLE, ViewEdges.VIEW_ENTENTE, ViewEdges.VIEW_NEUTRAL, ViewEdges.VIEW_OPPOSITION,
+                     ViewEdges.VIEW_GROUPES]
+        if not view_edges:
+            edges = all_edges
+
         nodes: list[str] = []
-        if node_selected == 'All':
+        if node_selected == 'All' and set(all_edges).issubset(all_edges):
             nodes = self.get_perso_ids(full_graph)
-            if ViewEdges.VIEW_ALL in view_edges:
-                nodes += groups
+
         else:
             nodes.append(node_selected)
 
