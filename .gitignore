@@ -3,3 +3,5 @@
 tmp/
 
 cookie.py
+
+__pycache__
