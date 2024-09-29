@@ -86,52 +86,6 @@ class ImageGenerator:
                     if ViewEdges.VIEW_GROUPES in view_edges:
                         self.add_linked_nodes_by_edges(first_node, second_node, nodes, groupe_nodes, temp)
 
-    def build_list_options_persos(self, node_selected, lignes):
-        """
-        Récupère la map des nodes de persos et leur label dans le graphe complet
-        :param node_selected: noeud selectionné
-        :param lignes: les lignes du fichier dot
-        :return:  la map des nodes de persos
-        """
-        option_persos = []
-        label = ''
-        for l in lignes:
-            selected = ''
-            if 'peripheries=' + NodeType.node_peripheries.get(Personnage) + \
-                    ' shape=' + NodeType.node_shapes.get(Personnage) in l:
-                n = re.findall(r'([a-zA-Z]+) \[label=("([^\"]*)"|([^ ]*))', l)
-                nom_graph = n[0][0]
-                if n[0][2]:
-                    label = n[0][2]
-                elif n[0][3]:
-                    label = n[0][3]
-                    print(nom_graph)
-                if node_selected == nom_graph:
-                    selected = ' selected'
-                option_persos.append(f"""<option value="{nom_graph}"{selected}>{label}</option>""")
-        return option_persos
-
-    def build_list_options_persos2(self, lignes):
-        """
-        Récupère la map des nodes de persos et leur label dans le graphe complet
-        :param lignes: les lignes du fichier dot
-        :return:  la map des nodes de persos
-        """
-        option_persos = []
-        label = ''
-        for l in lignes:
-            if 'peripheries=' + NodeType.node_peripheries.get(Personnage) + \
-                    ' shape=' + NodeType.node_shapes.get(Personnage) in l:
-                n = re.findall(r'([a-zA-Z]+) \[label=("([^\"]*)"|([^ ]*))', l)
-                nom_graph = n[0][0]
-                if n[0][2]:
-                    label = n[0][2]
-                elif n[0][3]:
-                    label = n[0][3]
-                    print(nom_graph)
-                option_persos.append(f"""<option value="{nom_graph}">{label}</option>""")
-        return option_persos
-
     def get_perso_nodes(self, lignes):
         """
         Récupère la liste des nodes de perso dans le fichier graphe complet

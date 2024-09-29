@@ -1,8 +1,11 @@
 #!/usr/bin/python3
 # coding: utf-8
+import re
 from image import ImageGenerator
-from image import ViewEdges
-from image import DistNode
+from constants import ViewEdges
+from constants import DistNode
+from constants import NodeType
+from constants import Personnage
 
 
 class GraphParameters:
@@ -33,6 +36,31 @@ class GraphPage:
     </head>
     """
 
+    def build_list_options_persos(self, node_selected, lignes):
+        """
+        Récupère la map des nodes de persos et leur label dans le graphe complet
+        :param node_selected: noeud selectionné
+        :param lignes: les lignes du fichier dot
+        :return:  la map des nodes de persos
+        """
+        option_persos = []
+        label = ''
+        for l in lignes:
+            selected = ''
+            if 'peripheries=' + NodeType.node_peripheries.get(Personnage) + \
+                    ' shape=' + NodeType.node_shapes.get(Personnage) in l:
+                n = re.findall(r'([a-zA-Z]+) \[label=("([^\"]*)"|([^ ]*))', l)
+                nom_graph = n[0][0]
+                if n[0][2]:
+                    label = n[0][2]
+                elif n[0][3]:
+                    label = n[0][3]
+                    print(nom_graph)
+                if node_selected == nom_graph:
+                    selected = ' selected'
+                option_persos.append(f"""<option value="{nom_graph}"{selected}>{label}</option>""")
+        return option_persos
+
     def _build_graph_svg(self, parameters: GraphParameters):
         node = parameters.node
         edges = parameters.edges
@@ -56,7 +84,7 @@ class GraphPage:
         return svg
 
     def _build_character_selector(self, node_selected: str) -> str:
-        options_persos = self.image.build_list_options_persos(node_selected, self.lignes)
+        options_persos = self.build_list_options_persos(node_selected, self.lignes)
         return f"""<div>
                     <label for="personnage">Personnage :</label><br>
                     <select name="node" onchange="this.form.submit()">
