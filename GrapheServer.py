@@ -10,8 +10,10 @@ from graph_page import GraphPage
 
 PORT = 8000
 
+
 class MyHandler(http.server.BaseHTTPRequestHandler):
     graph_page = GraphPage()
+
     @staticmethod
     def parse_parameters(url: str) -> GraphParameters:
         parameters = GraphParameters()
@@ -19,6 +21,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
         params = parse_qs(parsed_url.query)
         parameters.node = params['node'][0] if 'node' in params else ''
         parameters.edges = params['edges'] if 'edges' in params else []
+        parameters.distance = params['distance'][0] if 'distance' in params else ''
         return parameters
 
     def do_GET(self):

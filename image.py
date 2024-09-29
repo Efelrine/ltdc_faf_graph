@@ -237,21 +237,22 @@ class ImageGenerator:
                         if ViewEdges.VIEW_GROUPES in view_edges:
                             dot.edge(edge.first_node, edge.second_node, color=edge.fillcolor, dir=edge.dir)
 
-    def build_svg(self, node_selected, view_edges=[ViewEdges.VIEW_ALL]):
+    def build_svg(self, node_selected, view_edges, distance):
         lignes = self.get_lignes_graphe_complet()
         groupe_nodes = self.get_groupe_nodes(lignes)
 
         nodes = []
         if node_selected == 'All':
             nodes = self.get_perso_nodes(lignes)
-            if ViewEdges.VIEW_ALL in view_edges:
+            if ViewEdges.VIEW_GROUPES in view_edges:
                 nodes += groupe_nodes
         else:
             nodes.append(node_selected)
             # noeuds à degré 1
             self.add_linked_nodes(nodes, lignes, view_edges)
-            # noeuds à degré 2
-            self.add_linked_nodes(nodes, lignes, view_edges, groupe_nodes)
+            if distance != DistNode.DIST_ONE:
+                # noeuds à degré 2
+                self.add_linked_nodes(nodes, lignes, view_edges, groupe_nodes)
 
         dot = Digraph(name='GrapheTdC', filename='./tmp/gnTdcMini',
                       comment='La fleur au Fusil Mini', engine=ENGINE)

@@ -2,10 +2,13 @@
 # coding: utf-8
 from image import ImageGenerator
 from image import ViewEdges
+from image import DistNode
+
 
 class GraphParameters:
     node = ''
     edges = []
+    distance = ''
 
 
 class GraphPage:
@@ -16,7 +19,7 @@ class GraphPage:
     <head>
         <title>Graphe La Fleur au Fusil</title>
         <style type="text/css">
-            .formgrid {
+            .formflex {
                 display: flex;
                 align-items: center;
                 column-gap: 40px;
@@ -33,14 +36,18 @@ class GraphPage:
     def _build_graph_svg(self, parameters: GraphParameters):
         node = parameters.node
         edges = parameters.edges
+        distance = parameters.distance
+        all_edges = [ViewEdges.VIEW_FAMILLE, ViewEdges.VIEW_ENTENTE, ViewEdges.VIEW_NEUTRAL, ViewEdges.VIEW_OPPOSITION,
+                     ViewEdges.VIEW_GROUPES]
+        if not edges:
+            edges = all_edges
 
         svg: str
-        if node == 'All' and edges == [ViewEdges.VIEW_FAMILLE, ViewEdges.VIEW_ENTENTE,
-                                       ViewEdges.VIEW_NEUTRAL, ViewEdges.VIEW_OPPOSITION]:
+        if node == 'All' and set(all_edges).issubset(edges):
             with open("./tmp/gnTdc.svg", encoding='utf8') as file:
                 svg = file.read()
         else:
-            self.image.build_svg(node, edges)
+            self.image.build_svg(node, edges, distance)
             with open("./tmp/gnTdcMini.svg", encoding='utf8') as file:
                 svg = file.read()
 
@@ -102,17 +109,35 @@ class GraphPage:
             </fieldset>
         </div>"""
 
+    @staticmethod
+    def _build_distance_selector(distance_selected: str) -> str:
+        dist_one_selected = 'checked' if distance_selected == DistNode.DIST_ONE else ''
+        dist_two_selected = 'checked' if distance_selected == '' or distance_selected == DistNode.DIST_TWO else ''
+        return f"""<div>
+            <fieldset>
+                <legend>Quel degré de distance ?</legend>
+                <input type="radio" id="distone" name="distance" value="{DistNode.DIST_ONE}"
+                    {dist_one_selected}/>
+                <label for="distone">Degré 1</label><br />
+
+                <input type="radio" id="disttwo" name="distance" value="{DistNode.DIST_TWO}"
+                    {dist_two_selected}/>
+                <label for="disttwo">Degré 2</label><br />
+            </fieldset>
+        </div>"""
+
     def build_graph_page(self, parameters: GraphParameters) -> bytes:
         return f"""<!DOCTYPE html>
            {self._HEADERS}
             <body>
                 <form method = 'GET' action=".">
-                    <div class=formgrid>
+                    <div class=formflex>
                         {self._build_character_selector(parameters.node)}
                         {self._build_egdes_selector(parameters.edges)}
+                        {self._build_distance_selector(parameters.distance)}
                     </div>
                     <br>
-                    <div class=formgrid>
+                    <div class=formflex>
                         <button type="submit">Afficher</button>
                     </div>
                 </form>
