@@ -7,11 +7,14 @@ from urllib.parse import urlparse
 from urllib.parse import parse_qs
 from graph_page import GraphParameters
 from graph_page import GraphPage
+from graph.graph_data import GraphDataBuilder
 
 PORT = 8000
 
 class MyHandler(http.server.BaseHTTPRequestHandler):
     graph_page = GraphPage()
+    data_builder = GraphDataBuilder()
+
     @staticmethod
     def parse_parameters(url: str) -> GraphParameters:
         parameters = GraphParameters()
@@ -28,6 +31,8 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
 
         if path == '/':
             self.serve_graph_page()
+        if path == '/graph_data':
+            self.serve_graph_data()
         else:
             self.serve_site_file(path[1:])
 
@@ -43,6 +48,13 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
             self.wfile.write('404 : File not found'.encode('utf-8'))
+
+    def serve_graph_data(self) -> None:
+        parameters = self.parse_parameters(self.path)
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json; charset=UTF-8')
+        self.end_headers()
+        self.wfile.write(self.data_builder.build_graph_data(parameters).encode('utf-8'))
 
     def serve_graph_page(self) -> None:
         parameters = self.parse_parameters(self.path)

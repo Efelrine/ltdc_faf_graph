@@ -105,7 +105,6 @@ class ImageGenerator:
                     label = n[0][2]
                 elif n[0][3]:
                     label = n[0][3]
-                    print(nom_graph)
                 if node_selected == nom_graph:
                     selected = ' selected'
                 option_persos.append(f"""<option value="{nom_graph}"{selected}>{label}</option>""")
@@ -128,7 +127,6 @@ class ImageGenerator:
                     label = n[0][2]
                 elif n[0][3]:
                     label = n[0][3]
-                    print(nom_graph)
                 option_persos.append(f"""<option value="{nom_graph}">{label}</option>""")
         return option_persos
 
